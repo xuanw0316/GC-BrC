@@ -399,9 +399,13 @@ CONTAINS
        SpcArr = SpcArr * SpcScal(N)
 
        SELECT CASE ( SpcNames(N) ) 
-          CASE ( 'OCPI' )
+          !CASE ( 'OCPI' )
+             !SpcArr = SpcArr * OCPIfrac
+          !CASE ( 'OCPO' )
+             !SpcArr = SpcArr * (1.0_sp - OCPIfrac)
+          CASE ( 'BBOCPI' )
              SpcArr = SpcArr * OCPIfrac
-          CASE ( 'OCPO' )
+          CASE ( 'BBOCPO' )
              SpcArr = SpcArr * (1.0_sp - OCPIfrac)
           CASE ( 'BCPI' )
              SpcArr = SpcArr * BCPIfrac
@@ -740,11 +744,15 @@ CONTAINS
              SpcName = 'BC'
           ELSEIF ( SpcName(1:2) == 'OC' ) THEN
              SpcName = 'OC'
+          ELSEIF ( SpcName(3:4) == 'OC' ) THEN
+             SpcName = 'OC'
           ENDIF
        ENDIF
        IF ( TRIM(SpcName) == 'POG1' ) SpcName = 'OC'
        IF ( TRIM(SpcName) == 'POG2' ) SpcName = 'OC'
        IF ( TRIM(SpcName) == 'NAP'  ) SpcName = 'CO'
+       
+
 
        ! Search for matching GFED species by name
        Matched = .FALSE.

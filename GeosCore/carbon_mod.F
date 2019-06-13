@@ -358,6 +358,8 @@
       INTEGER :: id_TSOG3,   id_XYLE,   id_LBRO2N, id_LBRO2H, id_LTRO2N
       INTEGER :: id_LTRO2H,  id_LXRO2N, id_LXRO2H, id_LNRO2N, id_LNRO2H
       INTEGER :: id_LISOPOH, id_LISOPNO3
+      INTEGER :: id_bfOCPO,  id_bfOCPI, id_bfOCPO1,id_bfOCPI1
+      INTEGER :: id_bbOCPO,  id_bbOCPI, id_bbOCPO1,id_bbOCPI1
 
       !=================================================================
       ! MODULE ROUTINES -- follow below the "CONTAINS" statement 
@@ -578,21 +580,103 @@
          ENDIF
       ENDIF
 
-      ! Chemistry for hydrophobic OC (traditional POA only) 
       IF ( id_OCPO > 0 ) THEN
          CALL CHEM_OCPO( am_I_Root, Input_Opt, Spc(:,:,:,id_OCPO), RC )
          IF ( prtDebug ) THEN
             CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_OCPO' )
          ENDIF
       ENDIF
-
-      ! Chemistry for hydrophilic OC (traditional POA only)
-      IF ( id_OCPI > 0 ) THEN 
+      IF ( id_OCPI > 0 ) THEN
          CALL CHEM_OCPI( am_I_Root, Input_Opt, Spc(:,:,:,id_OCPI), RC )
          IF ( prtDebug ) THEN
             CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_OCPI' )
          ENDIF
       ENDIF
+
+      IF ( id_bfOCPO > 0 ) THEN
+         CALL CHEM_OCPO( am_I_Root, Input_Opt, Spc(:,:,:,id_bfOCPO), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bfOCPO' )
+         ENDIF
+      ENDIF
+      IF ( id_bfOCPI > 0 ) THEN
+         CALL CHEM_OCPI( am_I_Root, Input_Opt, Spc(:,:,:,id_bfOCPI), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bfOCPI' )
+         ENDIF
+      ENDIF
+
+      IF ( id_bbOCPO > 0 ) THEN
+         CALL CHEM_OCPO( am_I_Root, Input_Opt, Spc(:,:,:,id_bbOCPO), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bbOCPO' )
+         ENDIF
+      ENDIF
+      IF ( id_bbOCPI > 0 ) THEN
+         CALL CHEM_OCPI( am_I_Root, Input_Opt, Spc(:,:,:,id_bbOCPI), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bbOCPI' )
+         ENDIF
+      ENDIF
+
+      IF ( id_bfOCPO1 > 0 ) THEN
+         CALL CHEM_OCPO( am_I_Root, Input_Opt, Spc(:,:,:,id_bfOCPO1),RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bfOCPO1' )
+         ENDIF
+      ENDIF
+      IF ( id_bfOCPI1 > 0 ) THEN
+         CALL CHEM_OCPI( am_I_Root, Input_Opt, Spc(:,:,:,id_bfOCPI1),RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bfOCPI1' )
+         ENDIF
+      ENDIF
+  
+      IF ( id_bbOCPO1 > 0 ) THEN
+         CALL CHEM_OCPO( am_I_Root, Input_Opt, Spc(:,:,:,id_bbOCPO1),RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bbOCPO1' )
+         ENDIF
+      ENDIF
+      IF ( id_bbOCPI1 > 0 ) THEN
+         CALL CHEM_OCPI( am_I_Root, Input_Opt, Spc(:,:,:,id_bbOCPI1),RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_bbOCPI1' )
+         ENDIF
+      ENDIF
+
+      ! Chemistry for brown carbon photobleaching
+      IF ( id_bbOCPI1 > 0 ) THEN
+         CALL CHEM_BRC( am_I_Root, Input_Opt, State_Chm, State_Met, 
+     &            Spc(:,:,:,id_bbOCPI), Spc(:,:,:,id_bbOCPI1), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_BRC bb OCPI' )
+         ENDIF
+      ENDIF
+      IF ( id_bfOCPI1 > 0 ) THEN
+         CALL CHEM_BRC( am_I_Root, Input_Opt, State_Chm, State_Met,
+     &            Spc(:,:,:,id_bfOCPI), Spc(:,:,:,id_bfOCPI1), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_BRC bf OCPI' )
+         ENDIF
+      ENDIF
+      IF ( id_bbOCPO1 > 0 ) THEN
+         CALL CHEM_BRC( am_I_Root, Input_Opt, State_Chm, State_Met,
+     &            Spc(:,:,:,id_bbOCPO), Spc(:,:,:,id_bbOCPO1), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_BRC bb OCPO' )
+         ENDIF
+      ENDIF
+      IF ( id_bfOCPO1 > 0 ) THEN
+         CALL CHEM_BRC( am_I_Root, Input_Opt, State_Chm, State_Met,
+     &            Spc(:,:,:,id_bfOCPO), Spc(:,:,:,id_bfOCPO1), RC)
+         IF ( prtDebug ) THEN
+            CALL DEBUG_MSG( '### CHEMCARBON: a CHEM_BRC bf OCPO' )
+         ENDIF
+      ENDIF
+
+
+
 
 #if   defined( TOMAS )
       ! Chemistry (aging) for size-resolved EC and OC (win, 1/25/10)
@@ -1182,6 +1266,116 @@
       OCCONV = 0e+0_fp
 
       END SUBROUTINE CHEM_OCPI
+!EOC
+!------------------------------------------------------------------------------
+!                  GEOS-Chem Global Chemical Transport Model
+!                  !
+!------------------------------------------------------------------------------
+!BOP
+!
+! !IROUTINE: chem_brc
+!
+! !DESCRIPTION: Subroutine CHEM\_BrC calculates the photobleaching of
+! BrC.
+!\\
+!\\
+! !INTERFACE:
+!
+      SUBROUTINE CHEM_BRC( am_I_Root, Input_Opt, State_Chm, State_Met, 
+     &                      TC, TC1, RC )
+!
+! !USES:
+!
+      USE CMN_DIAG_MOD
+      USE CMN_SIZE_MOD
+      USE ErrCode_Mod
+      USE Input_Opt_Mod,      ONLY : OptInput
+      USE State_Met_Mod,      ONLY : MetState
+      USE State_Chm_Mod,      ONLY : ChmState
+      USE TIME_MOD,           ONLY : GET_TS_CHEM
+!
+! !INPUT PARAMETERS: 
+!
+      LOGICAL,        INTENT(IN)    :: am_I_Root             ! Root CPU?
+      TYPE(OptInput), INTENT(IN)    :: Input_Opt             ! Input Options
+      TYPE(ChmState), INTENT(IN)  :: State_Chm   ! Chemistry State object
+      TYPE(MetState), INTENT(IN)  :: State_Met   ! Meteorology State object
+!
+! !INPUT/OUTPUT PARAMETERS: 
+!
+      REAL(fp),       INTENT(INOUT) :: TC(IIPAR,JJPAR,LLPAR) ! not-aged BrC [kg]
+      REAL(fp),       INTENT(INOUT) :: TC1(IIPAR,JJPAR,LLPAR) ! aged BrC [kg]
+!
+! !OUTPUT PARAMETERS:
+!
+      INTEGER,        INTENT(OUT)   :: RC                    ! Success?
+!
+! !REMARKS:
+! 
+! !REVISION HISTORY:
+!  20 Jul 2018 - X. Wang - Initial version
+!EOP
+!------------------------------------------------------------------------------
+!BOC
+!
+! !LOCAL VARIABLES:
+!
+      ! Scalars
+      INTEGER  :: I,   J,     L
+      REAL(fp) :: TC0, TC2, RKT
+      REAL(fp) :: KBR, OH, BRCONV, CNEW, DTCHEM
+
+      REAL(fp),  PARAMETER :: BR_LIFE = 0.917e+0_fp
+                              !day time with OH = 5e5  moles/cm3
+
+      !=================================================================
+      ! CHEM_BRC begins here!
+      !=================================================================
+
+      ! Assume success
+      RC        = GC_SUCCESS
+
+      ! Initialize
+      KBR       = 1.e+0_fp / ( 86400e+0_fp * BR_LIFE ) !xnw_braging
+      DTCHEM    = GET_TS_CHEM() * 60e+0_fp
+      BRCONV    = 0e+0_fp
+
+!$OMP PARALLEL DO
+!$OMP+DEFAULT( SHARED )
+!$OMP+PRIVATE( I, J, L, TC0, TC2, KBR, OH, BRCONV, CNEW, RKT)
+!$OMP+SCHEDULE( DYNAMIC )
+      DO L = 1, LLPAR
+      DO J = 1, JJPAR
+      DO I = 1, IIPAR
+
+         ! Initial OC [kg]
+         TC0 = TC(I,J,L)
+         TC2 = TC1(I,J,L)
+
+         ! Do photo-bleaching calculation
+         KBR  = 1.e+0_fp / ( 86400e+0_fp * BR_LIFE )
+         OH = GET_OH(I, J, L, Input_Opt, State_Chm, State_Met)
+         KBR = KBR * OH / (5e+5_fp)
+         RKT  = KBR * DTCHEM
+         CNEW = TC0 * EXP( -RKT )
+
+         ! Prevent underflow condition
+         IF ( CNEW < SMALLNUM ) CNEW = 0e+0_fp
+
+         ! Amount of non-aged BrC converted to aged BrC [kg/timestep]
+         BRCONV = TC0 - CNEW    
+         IF ( BRCONV < SMALLNUM ) BRCONV = 0e+0_fp
+              
+         ! Store modified OC concentration back in tracer array
+         TC(I,J,L) = CNEW
+         TC1(I,J,L) = TC2 + BRCONV
+
+      ENDDO
+      ENDDO
+      ENDDO
+!$OMP END PARALLEL DO  
+
+      END SUBROUTINE CHEM_BRC
 !EOC
 #if   defined( TOMAS )
 !-------------------------------------------------------------------------------
@@ -2184,7 +2378,12 @@
          !-----------------------------------------------------------
          ! Now treat either traditional POA or semivolatile POA (hotp 7/25/10)
          IF ( id_OCPI > 0 .and. id_OCPO > 0 ) THEN
-            MPOC = ( Spc(I,J,L,id_OCPI) + Spc(I,J,L,id_OCPO) ) * FAC
+            !MPOC = ( Spc(I,J,L,id_OCPI) + Spc(I,J,L,id_OCPO) ) * FAC
+            MPOC = ( Spc(I,J,L,id_OCPI) + Spc(I,J,L,id_OCPO)  + 
+     &               Spc(I,J,L,id_bfOCPI) + Spc(I,J,L,id_bfOCPO)  +  
+     &               Spc(I,J,L,id_bfOCPI1) + Spc(I,J,L,id_bfOCPO1)  +
+     &               Spc(I,J,L,id_bbOCPI) + Spc(I,J,L,id_bbOCPO)  + 
+     &               Spc(I,J,L,id_bbOCPI1) + Spc(I,J,L,id_bbOCPO1))*FAC
             MPOC = MPOC * 2.1e+0_fp
          ELSE
             ! semivolpoa2: MPOC is zero now (hotp 2/27/09)
@@ -7517,9 +7716,15 @@ ccc
      &            Spc(I,J,L,id_OPOA1) * OCFOPOA +
      &            Spc(I,J,L,id_OPOA2) * OCFOPOA
       ELSEIF ( id_OCPI > 0 ) THEN
+!         MOTEMP = MOTEMP +
+!     &           ( Spc(I,J,L,id_OCPI) + 
+!     &			 Spc(I,J,L,id_OCPO) ) * 2.1e+0_fp
          MOTEMP = MOTEMP +
-     &           ( Spc(I,J,L,id_OCPI) + 
-     &			 Spc(I,J,L,id_OCPO) ) * 2.1e+0_fp
+     &           ( Spc(I,J,L,id_OCPI) + Spc(I,J,L,id_OCPO) +
+     &             Spc(I,J,L,id_bfOCPI) + Spc(I,J,L,id_bfOCPO) +    
+     &             Spc(I,J,L,id_bfOCPI1) + Spc(I,J,L,id_bfOCPO1) +
+     &             Spc(I,J,L,id_bbOCPI) + Spc(I,J,L,id_bbOCPO) +
+     &             Spc(I,J,L,id_bbOCPI1) + Spc(I,J,L,id_bbOCPO1) ) * 2.1e+0_fp
       ENDIF
 
       ! Convert Mo from [kg] to [ug/m3]
@@ -8858,6 +9063,14 @@ ccc
       id_OH       = IND_('OH'      )
       id_OCPO     = IND_('OCPO'    )
       id_OCPI     = IND_('OCPI'    )
+      id_bfOCPO     = IND_('BFOCPO'    )
+      id_bfOCPI     = IND_('BFOCPI'    )
+      id_bfOCPO1     = IND_('BFOCPO1'    )
+      id_bfOCPI1     = IND_('BFOCPI1'    )
+      id_bbOCPO     = IND_('BBOCPO'    )
+      id_bbOCPI     = IND_('BBOCPI'    )
+      id_bbOCPO1     = IND_('BBOCPO1'    )
+      id_bbOCPI1     = IND_('BBOCPI1'    )
       id_OPOA1    = IND_('OPOA1'   )
       id_OPOG1    = IND_('OPOG1'   )
       id_OPOA2    = IND_('OPOA2'   )

@@ -2586,13 +2586,14 @@ CONTAINS
 #endif                                      
                               RC            = RC )
 
-          CASE( 'OCPI', 'OCPO' )
+          CASE( 'OCPI', 'OCPO', 'BFOCPI', 'BFOCPO', 'BFOCPI1',  'BFOCPO1' , &
+                'BBOCPI', 'BBOCPO', 'BBOCPI1', 'BBOCPO1' )
              
              ! These have mostly identical properties
              ! Turn off rainout for hydrophobic OC, for all temperatures.
              SELECT CASE( NameAllCaps )
 
-                CASE( 'OCPI' )
+                CASE( 'OCPI','BFOCPI','BBOCPI','BFOCPI1','BBOCPI1' )
                    FullName = 'Hydrophilic organic carbon aerosol'
 
                    ! Halve the Kc (cloud condensate -> precip) rate
@@ -2602,7 +2603,7 @@ CONTAINS
                    ! Turn off rainout only when 237 K <= T < 258K.
                    RainEff  = (/ 1.0_fp, 0.0_fp, 1.0_fp /)
 
-                CASE( 'OCPO' )
+                CASE( 'OCPO','BFOCPO','BBOCPO','BFOCPO1','BBOCPO1' )
                    Fullname = 'Hydrophobic organic carbon aerosol'
 
                    ! For all temperatures:

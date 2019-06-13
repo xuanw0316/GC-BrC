@@ -2262,9 +2262,9 @@ c---TROP-QUICK  (must scale solar flux for W=5)
       INTEGER           :: I, J, K, N
       INTEGER           :: IOS
 #if defined( UCX )
-      CHARACTER*30      :: SPECFIL(8)
+      CHARACTER*30      :: SPECFIL(10)
 #else
-      CHARACTER*30      :: SPECFIL(6)
+      CHARACTER*30      :: SPECFIL(8)
 #endif
       CHARACTER(LEN=30) :: THISFILE
            
@@ -2283,6 +2283,7 @@ c---TROP-QUICK  (must scale solar flux for W=5)
       ! extra two LUT dat files for strat H2SO4 and NAT particles
              
        DATA SPECFIL /"so4.dat","soot.dat","org.dat","ssa.dat","ssc.dat",
+     &              "brc_bf.dat", "brc_bb.dat",
 #if defined( UCX )
       ! Treating strat sulfate with GADS data but modified to match
       ! the old Fast-J values size (r=0.09um, sg=0.6) - I think there's
@@ -3759,7 +3760,9 @@ c---    JADDLV is taken from JXTRA, which is based on visible OD.
 c---    JADDTO(L2=1:L2_+1) is the cumulative number of levels to be added
 c---these should be fixed for all wavelengths to lock-in the array sizes
 
+      JXL_ = LLPAR
       if (LU .gt. JXL_) then
+        print*, LU, JXL_
         call EXITC (' OPMIE:  JXL_ .lt. L_')
       endif
 
@@ -4505,7 +4508,7 @@ C---Always does PL(2) = P[1]
       !=================================================================
 
       ! Taken from aerosol_mod.F
-      IND = (/22,29,36,43,50/)
+      IND = (/22,29,36,43,50,36,36/)
 
       DO I=1,AN_
          MIEDX(I) = 0

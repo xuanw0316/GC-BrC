@@ -76,6 +76,15 @@
       REAL(fp), ALLOCATABLE, PUBLIC :: SOAG(:,:,:)
       REAL(fp), ALLOCATABLE, PUBLIC :: SOAM(:,:,:)
       REAL(fp), ALLOCATABLE, PUBLIC :: PM25(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bfOCPI(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bfOCPO(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bbOCPI(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bbOCPO(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bfOCPI1(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bfOCPO1(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bbOCPI1(:,:,:)
+      REAL(fp), ALLOCATABLE, PUBLIC :: bbOCPO1(:,:,:)
+
 !
 ! !DEFINED PARAMETERS:
 !
@@ -142,7 +151,9 @@
       ! Add tracer ID flags as module variables (bmy, 6/16/16)
       INTEGER :: id_BCPI,  id_BCPO,  id_DST1,  id_DST2
       INTEGER :: id_DST3,  id_DST4,  id_NH4,   id_NIT  
-      INTEGER :: id_OCPO,  id_OCPI,  id_SALA,  id_SALC 
+      INTEGER :: id_OCPO,  id_OCPI,  id_SALA,  id_SALC
+      INTEGER :: id_bfOCPO,  id_bfOCPI,  id_bfOCPO1,  id_bfOCPI1
+      INTEGER :: id_bbOCPO,  id_bbOCPI,  id_bbOCPO1,  id_bbOCPI1
       INTEGER :: id_SO4,   id_SOAG,  id_SOAM,  id_SO4s
       INTEGER :: id_NITs,  id_POA1,  id_POA2,  id_OPOA1
       INTEGER :: id_OPOA2, id_TSOA1, id_TSOA2, id_TSOA3 
@@ -533,12 +544,33 @@
             ELSE IF ( IS_OCPO ) THEN
                OCPO(I,J,L) = Spc(I,J,L,id_OCPO)
      &                       * OCFOPOA / AIRVOL(I,J,L)
+
+               bfOCPO(I,J,L) = Spc(I,J,L,id_bfOCPO)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bfOCPO1(I,J,L) = Spc(I,J,L,id_bfOCPO1)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bbOCPO(I,J,L) = Spc(I,J,L,id_bbOCPO)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bbOCPO1(I,J,L) = Spc(I,J,L,id_bbOCPO1)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+
             ENDIF
+            
 
             ! Hydrophilic OC [kg/m3]
             IF ( IS_OCPI ) THEN
                OCPI(I,J,L) = Spc(I,J,L,id_OCPI)
      &                       * OCFOPOA / AIRVOL(I,J,L)
+
+               bfOCPI(I,J,L) = Spc(I,J,L,id_bfOCPI)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bfOCPI1(I,J,L) = Spc(I,J,L,id_bfOCPI1)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bbOCPI(I,J,L) = Spc(I,J,L,id_bbOCPI)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+               bbOCPI1(I,J,L) = Spc(I,J,L,id_bbOCPI1)
+     &                       * OCFOPOA / AIRVOL(I,J,L)
+
             ENDIF
 
             IF ( LSOA ) THEN
@@ -610,7 +642,15 @@
             BCPO(I,J,L)    = MAX( BCPO(I,J,L), 1e-35_fp )
             OCPO(I,J,L)    = MAX( OCPO(I,J,L), 1e-35_fp )
             OCPISOA(I,J,L) = MAX( OCPISOA(I,J,L), 1e-35_fp )
-         
+            bfOCPI(I,J,L)    = MAX( bfOCPI(I,J,L), 1e-35_fp )         
+            bfOCPI1(I,J,L)    = MAX( bfOCPI1(I,J,L), 1e-35_fp )
+            bfOCPO(I,J,L)    = MAX( bfOCPO(I,J,L), 1e-35_fp )
+            bfOCPO1(I,J,L)    = MAX( bfOCPO1(I,J,L), 1e-35_fp )
+            bbOCPI(I,J,L)    = MAX( bbOCPI(I,J,L), 1e-35_fp )
+            bbOCPI1(I,J,L)    = MAX( bbOCPI1(I,J,L), 1e-35_fp )
+            bbOCPO(I,J,L)    = MAX( bbOCPO(I,J,L), 1e-35_fp )
+            bbOCPO1(I,J,L)    = MAX( bbOCPO1(I,J,L), 1e-35_fp )
+
          ENDIF ! LCARB
             
          !===========================================================
@@ -1046,13 +1086,15 @@
       ! Temporary varaibles
       REAL(fp)            :: RAER, SADSTRAT, RHOSTRAT, XSASTRAT
       INTEGER             :: ISTRAT
+      REAL(fp)            :: brabs, brscat
+
 
       ! Index to aerosol types in FJX_spec.dat
       ! The following are ordered according to the mass densities below
 #if defined( UCX )
-      INTEGER, SAVE       :: IND(NAER) = (/22, 29, 36, 43, 50, 4, 14/)
+      INTEGER, SAVE       :: IND(NAER) = (/22, 29, 36, 43, 50,36,36,4, 14/)
 #else
-      INTEGER, SAVE	  :: IND(NAER) = (/22, 29, 36, 43, 50/)
+      INTEGER, SAVE	  :: IND(NAER) = (/22, 29, 36, 43, 50,36,36 /)
 #endif
 
       ! Local variables for quantities from Input_Opt
@@ -1070,6 +1112,7 @@
       REAL(fp), POINTER   :: TAREA(:,:,:,:)
       REAL(fp), POINTER   :: WERADIUS(:,:,:,:)
       REAL(fp), POINTER   :: WTAREA(:,:,:,:)
+
 
       !=================================================================
       ! RDAER begins here!
@@ -1179,6 +1222,12 @@
             ! Hydrophobic OC [kg/m3]
             DAERSL(I,J,L,2) = OCPO(I,J,L)
 
+            !Brown carbon [kg/m3]
+            !WAERSL(I,J,L,6) = bfOCPI(I,J,L) + bfOCPI1(I,J,L)
+            !WAERSL(I,J,L,7) = bbOCPI(I,J,L) + bbOCPI1(I,J,L)
+            !DAERSL(I,J,L,3) = bfOCPO(I,J,L) + bfOCPO1(I,J,L)
+            !DAERSL(I,J,L,4) = bbOCPO(I,J,L) + bbOCPO1(I,J,L)
+
          ENDDO
          ENDDO
          ENDDO
@@ -1255,6 +1304,8 @@
       ENDIF
       MSDENS(4) = State_Chm%SpcData(id_SALA)%Info%Density
       MSDENS(5) = State_Chm%SpcData(id_SALC)%Info%Density
+      MSDENS(6) = State_Chm%SpcData(id_bfOCPI)%Info%Density
+      MSDENS(7) = State_Chm%SpcData(id_bbOCPI)%Info%Density
 #if defined( UCX )
       ! These default values unused (actively retrieved from ucx_mod)
       MSDENS(NRHAER+1) = 1700.0d0! SSA/STS
@@ -1330,10 +1381,14 @@
 
          !NRT is subscript for RT arrays that contain SNA separately
          !so their optics can be treated separately in future
-         IF (N.GT.1) THEN
+         IF ((N.GT.1) .and. (N.LE.5)) THEN
             NRT=N+2
-         ELSE
+         ELSEIF ((N.GE.6) .and. (N.LE.7)) THEN
+            NRT=5
+         ELSEIF (N.EQ.1) THEN
             NRT=N
+         ELSE 
+            NRT=N+2-2
          ENDIF
 
          !==============================================================
@@ -1382,7 +1437,7 @@
 
          ! Loop over grid boxes
 !$OMP PARALLEL DO
-!$OMP+PRIVATE( I,        J,       L,        IRH                 )
+!$OMP+PRIVATE( I,        J,       L,        IRH , brabs, brscat )
 !$OMP+PRIVATE( AW0,      QW0,     SSW0,     ASYW0,    REFF      )
 !$OMP+PRIVATE( SCALEA,   SCALEQ,  SCALESSA, SCALEASY, FRAC      )
 !$OMP+PRIVATE( SCALER,   SCALEOD, SCALEVOL, DRYAREA             )
@@ -1482,6 +1537,87 @@
 #if defined( UCX )
             IF (N.LE.NRHAER) THEN
 #endif
+
+            IF (N.EQ.6) THEN
+            !biofuel BrC, assuming fully aged BrC contributing 25%
+            !absorption
+            brabs = SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bfOCPI(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + SCALEOD*BXHEIGHT(I,J,L)*0.75d0 *0.25d0
+     &                         * bfOCPI1(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bfOCPO(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + 0.75d0 * BXHEIGHT(I,J,L) * 0.25d0*
+     &                         bfOCPO1(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+
+
+            brscat = SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bfOCPI(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         ( SCALESSA*SSAA(IWV,1,N) )
+            brscat = brscat + SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bfOCPI1(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) )
+            brscat = brscat + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bfOCPO(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) )
+            brscat = brscat + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bfOCPO1(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) )
+
+            ODAER(I,J,L,IWV,N) = brabs + brscat
+
+            ELSEIF (N.EQ.7) THEN
+            !bb BrC, assuming fully aged BrC contributing 25%
+            !absorption
+            brabs = SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bbOCPI(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + SCALEOD*BXHEIGHT(I,J,L)*0.75d0 *0.25d0
+     &                         * bbOCPI1(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bbOCPO(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+            brabs = brabs + 0.75d0 * BXHEIGHT(I,J,L) * 0.25d0*
+     &                         bbOCPO1(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (1.0d0 - SCALESSA*SSAA(IWV,1,N) )
+
+            brscat = SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bbOCPI(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         ( SCALESSA*SSAA(IWV,1,N) )
+            brscat = brscat + SCALEOD*BXHEIGHT(I,J,L)*0.75d0
+     &                         * bbOCPI1(I,J,L) * QQAA(IWV,1,N) /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) ) 
+            brscat = brscat + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bbOCPO(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) )
+            brscat = brscat + 0.75d0 * BXHEIGHT(I,J,L) *
+     &                         bbOCPO1(I,J,L) * QQAA(IWV,1,N)  /
+     &                         ( MSDENS(N) * REAA(1,N) * 1.0D-6 ) *
+     &                         (SCALESSA*SSAA(IWV,1,N) )
+
+            ODAER(I,J,L,IWV,N) = brabs + brscat
+            ELSE
+
             !calculate optics for hyrdophillic aerosol here
             !However MDENS in LUT was in g/cm3 not kg/m3 so x1e3
             ODAER(I,J,L,IWV,N) = SCALEOD*BXHEIGHT(I,J,L)*0.75d0 
@@ -1494,6 +1630,8 @@
      &                             0.75d0 * BXHEIGHT(I,J,L) *
      &                             DAERSL(I,J,L,N-1) * QQAA(IWV,1,N)  /
      &                             ( MSDENS(N) * REAA(1,N) * 1.0D-6 )
+            ENDIF
+
             ENDIF
 
 #if defined( UCX )
@@ -1527,6 +1665,13 @@
               RTSSAER(I,J,L,IWV,N+IR-1)   = SCALESSA*SSAA(IWV,1,N)
               RTASYMAER(I,J,L,IWV,N+IR-1) = SCALEASY*ASYMAA(IWV,1,N)
              ENDDO
+            ELSEIF ((N.EQ.6) .OR. (N.EQ.7)) THEN
+             
+             RTODAER(I,J,L,IWV,NRT) = RTODAER(I,J,L,IWV,NRT) +
+     &                                ODAER(I,J,L,IWV,N)
+             RTSSAER(I,J,L,IWV,NRT) = (brscat + 
+     &           ( RTODAER(I,J,L,IWV,NRT) - ODAER(I,J,L,IWV,N) ) * 
+     &           RTSSAER(I,J,L,IWV,NRT) ) / RTODAER(I,J,L,IWV,NRT)
             ELSE
              !RT arrays now offset from NAER by 2 (NRT=N+2 for N>1) 
              !If strat aerosol switched on (UCX) then this will
@@ -1974,7 +2119,16 @@
       id_ASOA1 = Ind_('ASOA1')  
       id_ASOA2 = Ind_('ASOA2') 
       id_ASOA3 = Ind_('ASOA3')
-
+       
+      id_bfOCPI = Ind_('BFOCPI')
+      id_bfOCPI1 = Ind_('BFOCPI1')    
+      id_bbOCPI = Ind_('BBOCPI')
+      id_bbOCPI1 = Ind_('BBOCPI1')
+      id_bfOCPO = Ind_('BFOCPO')   
+      id_bfOCPO1 = Ind_('BFOCPO1')
+      id_bbOCPO = Ind_('BBOCPO')
+      id_bbOCPO1 = Ind_('BBOCPO1')
+ 
       ! Allocate arrays
       ALLOCATE( BCPI( IIPAR, JJPAR, LLPAR ), STAT=AS )
       IF ( AS /= 0 ) CALL ALLOC_ERR( 'BCPI' )
@@ -2066,6 +2220,39 @@
       IF ( AS /= 0 ) CALL ALLOC_ERR( 'PM25' )
       PM25 = 0d0
 
+      ALLOCATE( bfOCPI( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bfOCPI' )
+      bfOCPI = 0d0
+      
+      ALLOCATE( bfOCPI1( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bfOCPI1' )
+      bfOCPI1 = 0d0
+
+      ALLOCATE( bfOCPO( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bfOCPO' )
+      bfOCPO = 0d0
+
+      ALLOCATE( bfOCPO1( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bfOCPO1' )
+      bfOCPO1 = 0d0
+
+      ALLOCATE( bbOCPI( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bbOCPI' )
+      bbOCPI = 0d0
+
+      ALLOCATE( bbOCPI1( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bbOCPI1' )
+      bbOCPI1 = 0d0
+
+      ALLOCATE( bbOCPO( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bbOCPO' )
+      bbOCPO = 0d0
+
+      ALLOCATE( bbOCPO1( IIPAR, JJPAR, LLPAR ), STAT=AS )
+      IF ( AS /= 0 ) CALL ALLOC_ERR( 'bbOCPO1' )
+      bbOCPO1 = 0d0
+
+
       ! Mass of hydrophobic aerosol from Mian Chin
       ALLOCATE( DAERSL(IIPAR,JJPAR,LLPAR,2), STAT=AS)       
       IF ( AS /= 0) CALL ALLOC_ERR( 'DAERSL' )
@@ -2125,6 +2312,15 @@
       IF ( ALLOCATED( SOAG        ) ) DEALLOCATE( SOAG        )
       IF ( ALLOCATED( SOAM        ) ) DEALLOCATE( SOAM        )
       IF ( ALLOCATED( PM25        ) ) DEALLOCATE( PM25        )
+      IF ( ALLOCATED( bfOCPI      ) ) DEALLOCATE( bfOCPI      )
+      IF ( ALLOCATED( bfOCPI1     ) ) DEALLOCATE( bfOCPI1     )
+      IF ( ALLOCATED( bfOCPO      ) ) DEALLOCATE( bfOCPO      )
+      IF ( ALLOCATED( bfOCPO1     ) ) DEALLOCATE( bfOCPO1     )
+      IF ( ALLOCATED( bbOCPI      ) ) DEALLOCATE( bbOCPI      )
+      IF ( ALLOCATED( bbOCPI1     ) ) DEALLOCATE( bbOCPI1     )
+      IF ( ALLOCATED( bbOCPO      ) ) DEALLOCATE( bbOCPO      )
+      IF ( ALLOCATED( bbOCPO1     ) ) DEALLOCATE( bbOCPO1     )
+
 
       END SUBROUTINE CLEANUP_AEROSOL
 !EOC
