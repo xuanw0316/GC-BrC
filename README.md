@@ -1,3 +1,6 @@
+Xuan Wang's codes for global brown carbon simulation
+based on:
+
 README -- Describes contents of GEOS-Chem repository
 
 01 Feb 2017
