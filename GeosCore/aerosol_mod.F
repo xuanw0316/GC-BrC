@@ -1827,7 +1827,7 @@
          ! Index for combination of aerosol type and RH
          N = NRHAER + ISTRAT
          ! For ND21
-         IOUT = 5 + 2*(NRHAER) + (3*(NDUST+NRHAER)) + (ISTRAT-1)*3
+         IOUT = 5 + 2*NRHAER + (3*(NDUST+NRHAER)) + (ISTRAT-1)*3
 
 !$OMP PARALLEL DO 
 !$OMP+DEFAULT( SHARED ) 
@@ -1932,7 +1932,7 @@
          DO ISTRAT=1,NSTRATAER
             W = 1
             N = NRHAER + ISTRAT 
-            IOUT = 5 + 5*(NRHAER + 3*NDUST + (ISTRAT-1)*3
+            IOUT = 5 + 5*NRHAER + 3*NDUST + (ISTRAT-1)*3
             DO L=1,LD21
             DO J=1,JJPAR
             DO I=1,IIPAR
@@ -2311,7 +2311,7 @@
       IF ( AS /= 0 ) CALL ALLOC_ERR( 'bbOCPO1' )
       bbOCPO1 = 0d0
 
-      ALLOCATE( BRABSD( IIPAR, JJPAR, LLPAR, 33 ), STAT=AS )
+      ALLOCATE( BRABSD( IIPAR, JJPAR, LLPAR, 40 ), STAT=AS )
       IF ( AS /= 0 ) CALL ALLOC_ERR( 'BRABSD' )
       BRABSD = 0d0
 
